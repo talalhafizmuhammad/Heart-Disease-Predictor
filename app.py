@@ -7,10 +7,13 @@ scaler = jb.load('scaler.pkl')
 Expected_cols = jb.load('columns.pkl')
 
 st.set_page_config(page_title="Heart Disease Predictor by Talal 💊",
-                   page_icon="💊", layout="centered")
+                   page_icon="🩺", layout="centered")
 
-theme = st.sidebar.radio("🌓 Theme", ["Light", "Dark"])
 
+st.sidebar.markdown("### :red[🩺 Theme]")
+theme_colored = st.sidebar.radio("", [":red[Light]", ":red[Dark]"], label_visibility="collapsed")
+
+theme = theme_colored.split('[')[1].split(']')[0]
 light_css = """
 <style>
 .stApp { background: linear-gradient(135deg, #f7f7fb 0%, #eef2f7 100%); color: #1f2937; }
@@ -25,16 +28,18 @@ light_css = """
 .section { font-weight: 700; color: #334155; margin: 6px 0 4px 0; font-size: 1.05rem; }
 div.row-widget.stSlider > div, div.row-widget.stNumberInput > div, div.row-widget.stSelectbox > div { margin-top:0px; margin-bottom:6px; }
 
-/* Force label colors in light mode */
-.stSlider label, .stNumberInput label, .stSelectbox label, 
-.stRadio label, div[data-baseweb="form-control"] label,
-div.stSlider > label, div.stNumberInput > label, 
-div.stSelectbox > label, .stMarkdown p,
-[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
-.st-emotion-cache-16idsys p, .st-emotion-cache-1gulkj5,
-div[data-testid="column"] label {
+/* Force label colors in light mode - ONLY main content area */
+.main .stSlider label, .main .stNumberInput label, .main .stSelectbox label,
+.main div[data-baseweb="form-control"] label,
+.main [data-testid="stWidgetLabel"], .main [data-testid="stWidgetLabel"] p,
+section.main div[data-testid="column"] label {
     color: #1f2937 !important;
     font-weight: 600 !important;
+}
+
+/* Ensure sidebar remains visible in light mode */
+.stSidebar, .stSidebar label, .stSidebar p, .stSidebar .stRadio label {
+    color: #1f2937 !important;
 }
 </style>
 """
@@ -53,16 +58,18 @@ dark_css = """
 .section { font-weight: 700; color: #f1f5f9; margin: 6px 0 4px 0; font-size: 1.05rem; }
 div.row-widget.stSlider > div, div.row-widget.stNumberInput > div, div.row-widget.stSelectbox > div { margin-top:0px; margin-bottom:6px; }
 
-/* Force label colors in dark mode */
-.stSlider label, .stNumberInput label, .stSelectbox label, 
-.stRadio label, div[data-baseweb="form-control"] label,
-div.stSlider > label, div.stNumberInput > label, 
-div.stSelectbox > label, .stMarkdown p,
-[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
-.st-emotion-cache-16idsys p, .st-emotion-cache-1gulkj5,
-div[data-testid="column"] label {
+/* Force label colors in dark mode - ONLY main content area */
+.main .stSlider label, .main .stNumberInput label, .main .stSelectbox label,
+.main div[data-baseweb="form-control"] label,
+.main [data-testid="stWidgetLabel"], .main [data-testid="stWidgetLabel"] p,
+section.main div[data-testid="column"] label {
     color: #f1f5f9 !important;
     font-weight: 600 !important;
+}
+
+/* Ensure sidebar remains visible in dark mode */
+.stSidebar, .stSidebar label, .stSidebar p, .stSidebar .stRadio label {
+    color: #f1f5f9 !important;
 }
 </style>
 """
@@ -71,35 +78,31 @@ st.markdown(dark_css if theme=="Dark" else light_css, unsafe_allow_html=True)
 
 label_override_css = f"""
 <style>
-/* Target all possible label selectors */
-.stSlider > label > div > div > div > p,
-.stNumberInput > label > div > div > div > p,
-.stSelectbox > label > div > div > div > p,
-[data-testid="stWidgetLabel"] > p,
-[data-testid="stWidgetLabel"] > div > p,
-.st-emotion-cache-16idsys > p,
-label[data-baseweb="form-control-label"],
-div[data-testid="column"] p,
-div.row-widget label p,
-div.stSlider p, div.stNumberInput p, div.stSelectbox p {{
+/* Target only main content area labels, not sidebar */
+.main .stForm label, .main .stForm p,
+.main form label, .main form p,
+section.main .stSlider p, section.main .stNumberInput p, section.main .stSelectbox p,
+div.block-container label, div.block-container [data-testid="stWidgetLabel"] p {{
     color: {"#1f2937" if theme=="Light" else "#f1f5f9"} !important;
     font-weight: 600 !important;
 }}
 
-/* Target Streamlit's emotion CSS classes */
-[class*="st-emotion-cache"] p {{
+/* Make sure sidebar stays visible */
+section[data-testid="stSidebar"] {{
     color: {"#1f2937" if theme=="Light" else "#f1f5f9"} !important;
 }}
-
-/* More specific targeting for form elements */
-.stForm label, .stForm p, form label, form p {{
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] .stRadio label,
+section[data-testid="stSidebar"] p {{
     color: {"#1f2937" if theme=="Light" else "#f1f5f9"} !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }}
 </style>
 """
 st.markdown(label_override_css, unsafe_allow_html=True)
 
-st.markdown('<div class="title">❤️ Heart Disease Predictor</div>', unsafe_allow_html=True)
+st.markdown('<div class="title">🏥 Heart Disease Predictor by Talal</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Enter your reports below — model & preprocessing unchanged</div>', unsafe_allow_html=True)
 
 with st.container():
